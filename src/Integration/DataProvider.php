@@ -1,6 +1,7 @@
 <?php
+declare(strict_types=1);
 
-namespace src\App\Integration;
+namespace App\Integration;
 
 class DataProvider
 {
@@ -9,9 +10,9 @@ class DataProvider
     private $password;
 
     /**
-     * @param $host
-     * @param $user
-     * @param $password
+     * @param string $host
+     * @param string $user
+     * @param string $password
      */
     public function __construct($host, $user, $password)
     {
@@ -20,13 +21,26 @@ class DataProvider
         $this->password = $password;
     }
 
-    /**
-     * @param array $request
-     *
-     * @return array
-     */
     public function get(array $request)
     {
-        // returns a response from external service
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $this->host . '?' . http_build_query($request));
+        curl_setopt($ch, CURLOPT_USERPWD, $this->user . ":" . $this->password);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $output = curl_exec($ch);
+        if(curl_errno($ch)){
+            throw new \Exception(curl_error($ch));
+        }
+        curl_close($ch);
+        //        // --- dump ---
+        //        echo '<pre>';
+        //        echo __FILE__ . chr(10);
+        //        echo __METHOD__ . chr(10);
+        //        var_dump($output);
+        //        echo '</pre>';
+        //        exit;
+        //        // --- // ---
+
+        return json_decode($output);
     }
 }

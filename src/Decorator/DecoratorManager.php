@@ -1,14 +1,13 @@
 <?php
+declare(strict_types=1);
 
-namespace src\App\Decorator;
+namespace App\Decorator;
 
-use DateTime;
 use Psr\Cache\CacheItemPoolInterface;
-use Psr\Log\LoggerInterface;
-use src\App\Integration\DataProvider;
 
-final class DecoratorManager extends DataProvider
+class DecoratorManager extends \App\Integration\DataProvider
 {
+    const CACE_SUFFIX = 'lesons';
     public $cache = null;
     public $logger;
 
@@ -16,27 +15,23 @@ final class DecoratorManager extends DataProvider
      * @param string $host
      * @param string $user
      * @param string $password
-     * @param LoggerInterface $logger
+     * @param \Psr\Log\LoggerInterface $logger
      */
-    public function __construct($host, $user, $password, LoggerInterface $logger)
+    public function __construct($host, $user, $password, \Psr\Log\LoggerInterface $logger)
     {
         parent::__construct($host, $user, $password);
         $this->logger = $logger;
     }
 
-    public function setCache(CacheItemPoolInterface $cache)
-    {
+    public function setCache(CacheItemPoolInterface $cache) {
         $this->cache = $cache;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getResponse(array $input)
     {
         try {
-            $cacheKey = $this->getCacheKey($input);
-            $cacheItem = $this->cache->getItem($cacheKey);
+            $cache_key = self::CACE_SUFFIX .json_encode($input);
+            $cacheItem = $this->cache->getItem($cache_key);
             if ($cacheItem->isHit()) return $cacheItem->get();
 
             $result = parent::get($input);
@@ -44,19 +39,14 @@ final class DecoratorManager extends DataProvider
             $cacheItem
                 ->set($result)
                 ->expiresAt(
-                    (new DateTime())->modify('+1 day')
+                    (new \DateTime())->modify('+1 day')
                 );
 
             return $result;
         } catch (\Exception $e) {
-            $this->logger->critical('Error');
+            $this->logger->critical("Error");
         }
 
         return [];
-    }
-
-    public function getCacheKey(array $input)
-    {
-        return json_encode($input);
     }
 }
