@@ -32,6 +32,11 @@ class Provider implements ProviderInterface
 
     public function get(array $request): array
     {
+        /**
+         * Можно было бы вести лог всех уходящих запросов и приходящих ответов
+         * а связывать их через сквозной request id
+         */
+
         try {
             $response = $this->guzzleClient->get('somepath', [
                 'query' => $request,
