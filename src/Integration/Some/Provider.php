@@ -61,8 +61,9 @@ class Provider implements ProviderInterface
         } catch (Exception $e) {
             $this->logger->error('Error getting data from remote server', [
                 'exception' => $e,
+                'request' => $request,
             ]);
-            throw new SomeException($e);
+            throw new SomeException($e, $request);
         }
     }
 }
