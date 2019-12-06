@@ -89,7 +89,7 @@ class ProviderDecoratorCachable implements ProviderInterface
         return $data;
     }
 
-    private function getCacheKey(array $request)
+    private function getCacheKey(array $request): string
     {
         /**
          * сортируем дабы ключ оставался неизменным при изменении порядка ключей массива
