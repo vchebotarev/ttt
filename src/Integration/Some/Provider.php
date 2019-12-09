@@ -40,6 +40,7 @@ class Provider implements ProviderInterface
         try {
             $response = $this->guzzleClient->get('somepath', [
                 'query' => $request,
+                //стоит добавить максимальное время ожидания ответа
             ]);
 
             //В зависимости от апи, может и другие коды можно считать валидными
@@ -53,7 +54,7 @@ class Provider implements ProviderInterface
              * Указано, что  на сервере установлен php 7.1, но если бы был 7.3+, то исключение мог бы бросить сам json_decode
              * или же можно использовать symfony/polyfill-php73
              */
-            $code = \json_last_error();
+            $code = json_last_error();
             if ($code !== \JSON_ERROR_NONE) {
                 throw new Exception(json_last_error_msg(), $code);
             }
